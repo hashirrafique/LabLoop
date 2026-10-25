@@ -14,7 +14,8 @@ router.post('/register', async (req, res) => {
   const body = req.body || {}
   const fullName = String(body.fullName || '').trim()
   const studentId = String(body.studentId || '').trim().toUpperCase()
-  const email = String(body.email || '').trim()
+  // lowercase so F221234@... and f221234@... count as the same account (login lowercases too)
+  const email = String(body.email || '').trim().toLowerCase()
   const password = String(body.password || '')
 
   if (!fullName || !studentId || !email || !password) {
