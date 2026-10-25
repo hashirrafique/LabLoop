@@ -57,6 +57,18 @@ npm run dev          # opens on http://localhost:5173
 The SQLite database file is created automatically in `server/data/` the first time the server
 starts.
 
+### Staff accounts
+
+Staff (lab engineer and HoD) can't sign up on the website. Create their accounts with:
+
+```bash
+cd server
+npm run seed:staff
+```
+
+This makes `labengineer@labloop.test` and `hod@labloop.test`. The password is printed in the
+terminal (it can be changed with `STAFF_PASSWORD` in `.env`).
+
 ## How we work
 
 - Every piece of work starts as an issue in Jira (LL-6, LL-7, ...)
