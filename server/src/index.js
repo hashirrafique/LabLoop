@@ -4,6 +4,7 @@ import cors from 'cors'
 import catalogueRoutes from './routes/catalogue.js'
 import db from './db/index.js'
 import authRoutes from './routes/auth.js'
+import registerRoutes from './routes/register.js'
 
 const app = express()
 
@@ -18,6 +19,7 @@ app.get('/api/health', (req, res) => {
 })
 
 app.use('/api/auth', authRoutes)
+app.use('/api/auth', registerRoutes)
 
 // any error thrown inside a route ends up here
 app.use((err, req, res, next) => {
