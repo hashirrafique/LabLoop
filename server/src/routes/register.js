@@ -1,6 +1,8 @@
 import { Router } from 'express'
 import bcrypt from 'bcryptjs'
+import crypto from 'node:crypto'
 import db from '../db/index.js'
+import { sendVerificationEmail } from '../utils/mailer.js'
 
 const router = Router()
 
@@ -8,7 +10,7 @@ const UNI_DOMAIN = process.env.UNI_EMAIL_DOMAIN || 'cfd.nu.edu.pk'
 const STUDENT_ID_FORMAT = /^\d{2}[A-Z]-\d{4}$/ // e.g. 22F-3294
 
 // POST /api/auth/register - students only, staff accounts are created with the seed script
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
   const body = req.body || {}
   const fullName = String(body.fullName || '').trim()
   const studentId = String(body.studentId || '').trim().toUpperCase()
@@ -38,12 +40,25 @@ router.post('/register', (req, res) => {
 
   // never store the plain password
   const passwordHash = bcrypt.hashSync(password, 10)
-  db.prepare(
-    `INSERT INTO users (full_name, student_id, email, password_hash, role, is_verified)
-     VALUES (?, ?, ?, ?, 'student', 0)`,
-  ).run(fullName, studentId, email, passwordHash)
+  const result = db
+    .prepare(
+      `INSERT INTO users (full_name, student_id, email, password_hash, role, is_verified)
+       VALUES (?, ?, ?, ?, 'student', 0)`,
+    )
+    .run(fullName, studentId, email, passwordHash)
 
-  res.status(201).json({ message: 'Account created' })
+  // account stays inactive until the link in the email is opened
+  const token = crypto.randomBytes(32).toString('hex')
+  db.prepare(
+    `INSERT INTO email_verifications (user_id, token, expires_at)
+     VALUES (?, ?, datetime('now', '+24 hours'))`,
+  ).run(result.lastInsertRowid, token)
+
+  await sendVerificationEmail(email, fullName, token)
+
+  res.status(201).json({
+    message: 'Account created. We sent a verification link to your university email.',
+  })
 })
 
 export default router
