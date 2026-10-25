@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
+    "seed:equipment": "node scripts/seedEquipment.js",
     "test": "node --test"
   },
   "keywords": [],
