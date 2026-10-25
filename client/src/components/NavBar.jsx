@@ -26,6 +26,7 @@ function NavBar() {
         <NavLink to="/" end>
           Home
         </NavLink>
+        <NavLink to="/catalogue">Catalogue</NavLink>
       </nav>
 
       <div className="nav-user">

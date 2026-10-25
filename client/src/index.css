@@ -205,3 +205,25 @@ th {
 .muted {
   color: var(--muted);
 }
+
+/* catalogue page */
+.filters {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.filters label {
+  margin-bottom: 0;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 8px;
+  grid-column: 1 / -1;
+}
+
+.small {
+  font-size: 13px;
+}
