@@ -40,7 +40,10 @@ function NavBar() {
             </button>
           </>
         ) : (
-          <NavLink to="/login">Log in</NavLink>
+          <>
+            <NavLink to="/login">Log in</NavLink>
+            <NavLink to="/register">Register</NavLink>
+          </>
         )}
       </div>
     </header>
