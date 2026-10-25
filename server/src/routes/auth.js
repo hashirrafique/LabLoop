@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import bcrypt from 'bcryptjs'
 import db from '../db/index.js'
-import { signToken } from '../middleware/auth.js'
+import { signToken, requireAuth } from '../middleware/auth.js'
 
 const router = Router()
 
@@ -38,6 +38,15 @@ router.post('/login', (req, res) => {
   }
 
   res.json({ token: signToken(user), user: toPublicUser(user) })
+})
+
+// GET /api/auth/me - the client calls this on page load to check if the saved token still works
+router.get('/me', requireAuth, (req, res) => {
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' })
+  }
+  res.json({ user: toPublicUser(user) })
 })
 
 export default router
