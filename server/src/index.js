@@ -1,13 +1,16 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
+import catalogueRoutes from './routes/catalogue.js'
 import db from './db/index.js'
+import authRoutes from './routes/auth.js'
 import registerRoutes from './routes/register.js'
 
 const app = express()
 
 app.use(cors())
 app.use(express.json())
+app.use('/api/catalogue', catalogueRoutes)
 
 // quick check that the server and the database are working
 app.get('/api/health', (req, res) => {
@@ -15,6 +18,7 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', users: row.users })
 })
 
+app.use('/api/auth', authRoutes)
 app.use('/api/auth', registerRoutes)
 
 // any error thrown inside a route ends up here
