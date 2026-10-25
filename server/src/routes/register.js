@@ -61,4 +61,35 @@ router.post('/register', async (req, res) => {
   })
 })
 
+// GET /api/auth/verify-email?token=... - opened from the link in the email
+router.get('/verify-email', (req, res) => {
+  const token = String(req.query.token || '')
+  const row = db
+    .prepare(
+      `SELECT id, user_id, used_at, expires_at < datetime('now') AS expired
+       FROM email_verifications
+       WHERE token = ?`,
+    )
+    .get(token)
+
+  if (!row) {
+    return res.status(400).json({ error: 'This verification link is not valid' })
+  }
+  if (row.used_at) {
+    return res.json({ message: 'Your email is already verified, you can log in.' })
+  }
+  if (row.expired) {
+    return res
+      .status(400)
+      .json({ error: 'This verification link has expired. Please contact the lab engineer.' })
+  }
+
+  db.transaction(() => {
+    db.prepare('UPDATE users SET is_verified = 1 WHERE id = ?').run(row.user_id)
+    db.prepare("UPDATE email_verifications SET used_at = datetime('now') WHERE id = ?").run(row.id)
+  })()
+
+  res.json({ message: 'Email verified! You can log in now.' })
+})
+
 export default router
